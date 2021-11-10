@@ -66,18 +66,21 @@ class Block {
 	public function render_callback( $attributes, $content, $block ) {
 
 		//Plugin text domain not set so just using this as an example
-		$example_text_domain = 'wxp-challenge';
+		$text_domain = 'wxp-challenge';
 
 		$post_types = get_post_types( [ 'public' => true ], 'objects' );
+		if( !is_array($post_types) ) {
+			return '';
+		}
 
 		$post_id = get_the_ID();
 		//Shouldn't need this but just in case
 		if( false === $post_id ) {
-			return;
+			return '';
 		}
 
 		$class_name = '';
-		//Shouldn't need this asdefault block attr but just in case
+		//Shouldn't need this as default block attr but just in case
 		if( isset($attributes['className']) ) {
 			$class_name = $attributes['className'];
 		}
@@ -85,36 +88,27 @@ class Block {
 		ob_start();
 		?>
 		<div class="<?php echo esc_attr( $class_name ); ?>">
-			<h2><?php echo esc_html_x( 'Post Counts', 'heading', $example_text_domain ); ?></h2>
+			<h2><?php echo esc_html_x( 'Post Counts', 'heading', $text_domain ); ?></h2>
 
 			<ul>
 				<?php
-				foreach ( $post_types as $post_type_slug ) :
-					$post_type_object = get_post_type_object( $post_type_slug );
-					$post_count = count(
-							get_posts(
-									[
-											'post_type'      => $post_type_slug,
-											'posts_per_page' => - 1,
-									]
-							)
-					);
-
+				foreach ( $post_types as $post_type_slug => $post_type_object ) :
+					$post_count = wp_count_posts( $post_type_slug );
 					?>
 					<li>
 						<?php
 						//Could use _n() function but probably would be messy due to both %d and %s in string
 						if( $post_count === 1 ): ?>
-							<?php printf( esc_html_x( 'There is only %d %s.', 'paragraph', $example_text_domain ), intval( $post_count ), esc_html( $post_type_object->labels->singular_name ) ); ?>
+							<?php printf( esc_html_x( 'There is only %d %s.', 'paragraph', $text_domain ), intval( $post_count ), esc_html( $post_type_object->labels->singular_name ) ); ?>
 						<?php else: ?>
-							<?php printf( esc_html_x( 'There are %d %s.', 'paragraph', $example_text_domain ), intval( $post_count ), esc_html( $post_type_object->labels->name ) ); ?>
+							<?php printf( esc_html_x( 'There are %d %s.', 'paragraph', $text_domain ), intval( $post_count ), esc_html( $post_type_object->labels->name ) ); ?>
 						<?php endif; ?>
 
 					</li>
 				<?php endforeach; ?>
 			</ul>
 
-			<p><?php printf( esc_html_x( 'The current post ID is %d', 'paragraph', $example_text_domain ), intval( $post_id ) ); ?></p>
+			<p><?php printf( esc_html_x( 'The current post ID is %d', 'paragraph', $text_domain ), intval( $post_id ) ); ?></p>
 
 			<?php
 			$query = new WP_Query(
@@ -140,7 +134,7 @@ class Block {
 
 			if ( $query->found_posts ) :
 				?>
-				<h2><?php echo esc_html_x( 'Any 5 posts with the tag of foo and the category of baz', 'heading', $example_text_domain ); ?></h2>
+				<h2><?php echo esc_html_x( 'Any 5 posts with the tag of foo and the category of baz', 'heading', $text_domain ); ?></h2>
 				<ul>
 					<?php foreach ( array_slice( $query->posts, 0, 5 ) as $post ) : ?>
 						<li><?php echo esc_html( $post->post_title ); ?></li>
