@@ -65,9 +65,20 @@ class Block {
 	 */
 	public function render_callback( $attributes, $content, $block ) {
 		$post_types = get_post_types( [ 'public' => true ] );
-		$class_name = $attributes['className'];
-		ob_start();
 
+		$post_id = get_the_ID();
+		//Shouldn't need this but just in case
+		if( false === $post_id ) {
+			return;
+		}
+
+		$class_name = '';
+		//Shouldn't need this asdefault block attr but just in case
+		if( isset($attributes['className']) ) {
+			$class_name = $attributes['className'];
+		}
+
+		ob_start();
 		?>
 		<div class="<?php echo $class_name; ?>">
 			<h2>Post Counts</h2>
@@ -88,7 +99,7 @@ class Block {
 					<li><?php echo 'There are ' . $post_count . ' ' . $post_type_object->labels->name . '.'; ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<p><?php echo 'The current post ID is ' . $_GET['post_id'] . '.'; ?></p>
+			<p><?php echo 'The current post ID is ' . $post_id . '.'; ?></p>
 
 			<?php
 			$query = new WP_Query(
@@ -107,7 +118,7 @@ class Block {
 							],
 							'tag'           => 'foo',
 							'category_name' => 'baz',
-							'post__not_in'  => [ get_the_ID() ],
+							'post__not_in'  => [ $post_id ],
 							'meta_value'    => 'Accepted',
 					]
 			);
