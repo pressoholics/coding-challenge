@@ -208,7 +208,7 @@ class Block {
 
 				//Going to cache this one, although PHP is quick, random selection may benefit from object cache
 				$cache  = [
-				    'key'   => 'random-posts',
+				    'key'   => "random-posts-{$post_id}-{$cat_slug}-{$meta_value}",
 				    'group' => 'xwp-code-challenge',
 				];
 
